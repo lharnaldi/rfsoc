@@ -16,8 +16,6 @@ PART = xczu28dr-ffvg1517-2-e
 CORES = axi_axis_reader_v1_0 \
 				axi_axis_writer_v1_0 \
 				axi_cfg_register_v1_0 \
-				axis_bram_reader_v1_0 \
-				axis_bram_writer_v1_0 \
 				axis_constant_v1_0 \
 				axis_counter_v1_0 \
 				axis_data_parallelizer_v1_0 \
