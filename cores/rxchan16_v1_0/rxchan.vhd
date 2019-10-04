@@ -29,6 +29,7 @@ entity rxchan is
 
 										 m_axis_tdata     : out  std_logic_vector (AXIS_TDATA_WIDTH_O-1 downto 0);
 										 m_axis_tvalid    : out  std_logic;
+										 m_axis_tlast     : out  std_logic;
 										 m_axis_tready    : in   std_logic;
 										 -- FIR interface
 										 fir_m_axis_data_tvalid   : out std_logic;
@@ -83,118 +84,13 @@ entity rxchan is
 										 fifo_m_axis_tready : in std_logic;
 										 fifo_m_axis_tdata  : out std_logic_vector(63 downto 0);
 										 fifo_s_axis_tvalid : in std_logic;
+										 fifo_s_axis_tlast  : in std_logic;
 										 fifo_s_axis_tready : out std_logic;
 										 fifo_s_axis_tdata  : in std_logic_vector(63 downto 0)
 						 );
 end rxchan;
 
 architecture rtl of rxchan is
-
-				--function clogb2 (value: natural) return natural is
-				--variable temp    : natural := value;
-				--variable ret_val : natural := 1;
-				--begin
-				--				while temp > 1 loop
-				--								ret_val := ret_val + 1;
-				--								temp    := temp / 2;
-				--				end loop;
-				--				return ret_val;
-				--end function;
-
-				--constant C_ADDR_SIZE : natural := clogb2(NCH); --counter addr_size
-				--constant M_ADDR_SIZE : natural := clogb2(2*NCH); --memory addr_size
-
-				-- FIR block
-				--component rx_fir
-				--				port (
-				--										 aclk               : in std_logic;
-				--										 aresetn            : in std_logic;
-				--										 s_axis_data_tvalid : in std_logic;
-				--										 s_axis_data_tready : out std_logic;
-				--										 s_axis_data_tlast  : in std_logic;
-				--										 s_axis_data_tdata  : in std_logic_vector(31 downto 0);
-				--										 s_axis_config_tvalid : in std_logic;
-				--										 s_axis_config_tready : out std_logic;
-				--										 s_axis_config_tlast : in std_logic;
-				--										 s_axis_config_tdata : in std_logic_vector(7 downto 0);
-				--										 m_axis_data_tvalid  : out std_logic;
-				--										 m_axis_data_tlast   : out std_logic;
-				--										 m_axis_data_tuser   : out std_logic_vector(4 downto 0);
-				--										 m_axis_data_tdata   : out std_logic_vector(47 downto 0);
-				--										 event_s_data_tlast_missing : out std_logic;
-				--										 event_s_data_tlast_unexpected : out std_logic;
-				--										 event_s_config_tlast_missing : out std_logic;
-				--										 event_s_config_tlast_unexpected : out std_logic
-				--						 );
-				--end component;
-
-				-- Memory to buffer the sample based output of the FIR and flip the channel 
-				-- order before the block based input of the FFT 
-				-- The receiver requires a different commutator direction to the transmitter 
-				-- and this implmented by flipping the channel order using this buffer
-				--component rx_mem
-				--				port (
-				--										 a        : in std_logic_vector(5-1 downto 0);
-				--										 d        : in std_logic_vector(33 downto 0);
-				--										 dpra     : in std_logic_vector(5-1 downto 0);
-				--										 clk      : in std_logic;
-				--										 we       : in std_logic;
-				--										 qdpo_clk : in std_logic;
-				--										 qdpo     : out std_logic_vector(33 downto 0)
-				--						 );
-				--end component;
-
-				-- Read address counter to reverse the channel order
-				--component reverse_addr
-				--				port (
-				--										 clk : in std_logic;
-				--										 ce : in std_logic;
-				--										 load : in std_logic;
-				--										 --    l : in std_logic_vector(C_ADDR_SIZE-1 downto 0);
-				--										 --    q : out std_logic_vector(C_ADDR_SIZE-1 downto 0)
-				--										 l : in std_logic_vector(5-1 downto 0);
-				--										 q : out std_logic_vector(5-1 downto 0)
-				--						 );
-				--end component;
-
-				-- IFFT block
-				--component rx_fft
-				--				port (
-				--										 aclk    : in std_logic;
-				--										 aresetn : in std_logic;
-				--										 s_axis_config_tdata : in std_logic_vector(7 downto 0);
-				--										 s_axis_config_tvalid : in std_logic;
-				--										 s_axis_config_tready : out std_logic;
-				--										 s_axis_data_tdata : in std_logic_vector(47 downto 0);
-				--										 s_axis_data_tvalid : in std_logic;
-				--										 s_axis_data_tready : out std_logic;
-				--										 s_axis_data_tlast : in std_logic;
-				--										 m_axis_data_tdata : out std_logic_vector(47 downto 0);
-				--										 m_axis_data_tvalid : out std_logic;
-				--										 m_axis_data_tready : in std_logic;
-				--										 m_axis_data_tlast : out std_logic;
-				--										 event_frame_started : out std_logic;
-				--										 event_tlast_unexpected : out std_logic;
-				--										 event_tlast_missing : out std_logic;
-				--										 event_status_channel_halt : out std_logic;
-				--										 event_data_in_channel_halt : out std_logic;
-				--										 event_data_out_channel_halt : out std_logic
-				--						 );
-				--end component;
-
-				-- Output FIFO to spread out the block based output of the FFT
-				--component rx_fifo
-				--				port (
-				--										 s_aclk    : in std_logic;
-				--										 s_aresetn : in std_logic;
-				--										 s_axis_tvalid : in std_logic;
-				--										 s_axis_tready : out std_logic;
-				--										 s_axis_tdata : in std_logic_vector(63 downto 0);
-				--										 m_axis_tvalid : out std_logic;
-				--										 m_axis_tready : in std_logic;
-				--										 m_axis_tdata : out std_logic_vector(63 downto 0)
-				--						 );
-				--end component;
 
 				signal s_fir_config_tdata  : std_logic_vector(7 downto 0):=std_logic_vector(to_unsigned(NCH-1,8));
 				--  signal s_fir_tdata         : std_logic_vector(31 downto 0):=(others=>'0');
@@ -359,6 +255,7 @@ begin
 				fifo_m_axis_tdata  <= s_fifo_tdata;
 
 				m_axis_tvalid <= fifo_s_axis_tvalid; 
+				m_axis_tlast  <= fifo_s_axis_tlast; 
 				fifo_s_axis_tready <= m_axis_tready;
 				m_fifo_tdata <= fifo_s_axis_tdata;
 
