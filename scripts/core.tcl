@@ -23,7 +23,7 @@ set_property LIBRARY {user} $core
 set_property VENDOR {labdpr} $core
 set_property VENDOR_DISPLAY_NAME {labdpr} $core
 set_property COMPANY_URL {http://labdpr.cab.cnea.gov.ar/} $core
-set_property SUPPORTED_FAMILIES {zynq Production} $core
+set_property SUPPORTED_FAMILIES {zynq ultrascale Production} $core
 
 proc core_parameter {name display_name description} {
   set core [ipx::current_core]
