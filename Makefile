@@ -26,6 +26,7 @@ CORES = axi_axis_reader_v1_0 \
 				axis_tlast_gen_v1_0 \
 				axis_trigger_v1_0 \
 				axis_txchan16_v1_0\
+				dna_reader_v1_0 \
 				gen_tonos_v1_0 \
 				pps_gen_v1_0 \
 				rxchan16_v1_0 \
