@@ -1,5 +1,5 @@
 # Create processing_system7
-cell xilinx.com:ip:processing_system7:5.5 ps_0 {
+cell xilinx.com:ip:zynq_ultra_ps_e:3.2 ps_0 {
   PCW_IMPORT_BOARD_PRESET cfg/red_pitaya.xml
   PCW_USE_S_AXI_HP0 1
 } {
