@@ -9,12 +9,16 @@
 LD_LIBRARY_PATH =
 
 NAME = led_blinker
-#PART = xczu28dr-ffvg1517-2-e
-PART = xc7z010clg400-1
+PART = xczu28dr-ffvg1517-2-e
+#PART = xc7z010clg400-1
 #PROC = ps7_cortexa9_0
 
 CORES = axi_axis_reader_v1_0 \
-				axi_sts_register_v1_0 \
+				axi_axis_writer_v1_0 \
+				axi_bram_reader_v1_0 \
+				axi_cfg_register_v1_0 \
+				axis_bram_reader_v1_0 \
+				axis_bram_writer_v1_0 \
 				axis_constant_v1_0 \
 				axis_counter_v1_0 \
 				axis_data_parallelizer_v1_0 \
@@ -23,6 +27,7 @@ CORES = axi_axis_reader_v1_0 \
 				axis_ram_writer_v1_0 \
 				axis_rxchan16_v1_0\
 				axis_signal_gen_v1_0 \
+				axi_sts_register_v1_0 \
 				axis_tlast_gen_v1_0 \
 				axis_trigger_v1_0 \
 				axis_txchan16_v1_0\
