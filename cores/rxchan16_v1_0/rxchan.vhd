@@ -81,6 +81,7 @@ entity rxchan is
 										 event_data_out_channel_halt_ifft : in std_logic;
 										 -- FIFO interface
 										 fifo_m_axis_tvalid : out std_logic;
+										 fifo_m_axis_tlast  : out std_logic;
 										 fifo_m_axis_tready : in std_logic;
 										 fifo_m_axis_tdata  : out std_logic_vector(63 downto 0);
 										 fifo_s_axis_tvalid : in std_logic;
@@ -250,6 +251,7 @@ begin
 				--  end process;
 
 
+				fifo_m_axis_tlast  <= ifft_s_axis_data_tlast; 
 				fifo_m_axis_tvalid <= m_fft_tvalid;
 				m_fft_tready <= fifo_m_axis_tready;
 				fifo_m_axis_tdata  <= s_fifo_tdata;
