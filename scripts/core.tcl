@@ -7,11 +7,23 @@ set elements [split $core_name _]
 set project_name [join [lrange $elements 0 end-2] _]
 set version [string trimleft [join [lrange $elements end-1 end] .] v]
 
-file delete -force tmp/cores/$core_name tmp/cores/$project_name.cache tmp/cores/$project_name.hw tmp/cores/$project_name.xpr tmp/cores/$project_name.ip_user_files
+file delete -force tmp/cores/$core_name tmp/cores/$project_name.cache tmp/cores/$project_name.hw tmp/cores/$project_name.srcs tmp/cores/$project_name.xpr tmp/cores/$project_name.ip_user_files
 
 create_project -part $part_name $project_name tmp/cores
 
 add_files -norecurse [glob cores/$core_name/*.vhd]
+#Aca especificamente genero el axis_rxchan16
+if {[string match "axis_firs_2ovs_v1_0" $core_name] || [string match "axis_complex_fir_v1_0" $core_name] || [string match "axis_rxc16_v1_0" $core_name] || [string match "axis_rxc16_125_fast_v1_0" $core_name] || [string match "axis_rxc16_dft_v1_0" $core_name] || [string match "axis_rxc16_dft_2ovs_v1_0" $core_name]} {
+   #if condition is true then print the following 
+	source cores/$core_name/xcore_gen.tcl
+   #add_files [glob cores/$core_name/*/*.xci]
+   ##add_files [glob cores/$core_name/*/*.xml]
+   #add_files [glob cores/$core_name/*/*.coe]
+   #puts "XXXX: archivos .xci agregados"
+} else {
+   #if condition is false then print the following 
+   puts "XXXX Nada se agrego"
+}
 
 ipx::package_project -import_files -root_dir tmp/cores/$core_name
 

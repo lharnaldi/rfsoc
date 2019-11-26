@@ -1,0 +1,79 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity axis_mux_2x1 is
+				generic (N    : natural := 32);
+				port (
+				aclk          : in std_logic;
+				aresetn       : in std_logic;
+
+				sel           : in std_logic;
+
+				s_axis_tdata0 : in std_logic_vector(N-1 downto 0);
+				s_axis_tvalid0: in std_logic; 
+				s_axis_tready0: out std_logic; 
+
+				s_axis_tdata1 : in std_logic_vector(N-1 downto 0);
+				s_axis_tvalid1: in std_logic; 
+				s_axis_tready1: out std_logic; 
+
+				m_axis_tdata  : out std_logic_vector(N-1 downto 0);
+				m_axis_tvalid : out std_logic; 
+				m_axis_tready : in std_logic
+
+				--in1, in2  : in std_logic_vector(N-1 downto 0);
+				--sel : in std_logic;
+				--sal : out std_logic_vector(N-1 downto 0)
+);
+end axis_mux_2x1;
+
+architecture rtl of axis_mux_2x1 is
+				signal data_r, data_n : std_logic_vector(N-1 downto 0);
+				signal valid_r, valid_n : std_logic;
+				signal ready_r, ready_n : std_logic;
+
+begin
+				process(aclk)
+				begin
+								if rising_edge(aclk) then
+												if aresetn = '0' then
+																data_r  <= (others => '0');
+																valid_r <= '0';
+																ready_r <= '0';
+												else
+																data_r  <= data_n;
+																valid_r <= valid_n;
+																ready_r <= ready_n;
+												end if;
+								end if;
+				end process;
+
+				--next-state logic
+				data_n <= s_axis_tdata0 when sel = '0' else 
+									s_axis_tdata1 when sel = '1' else
+									data_r;
+				valid_n <= s_axis_tvalid0 when sel = '0' else
+									 s_axis_tvalid1 when sel = '1' else
+									 valid_r;
+				ready_n <= m_axis_tready when sel = '0' else
+									 m_axis_tready when sel = '1' else
+									 ready_r;
+
+				--output logic
+				m_axis_tdata  <= data_r;
+				m_axis_tvalid <= valid_r;
+
+				s_axis_tready0 <= '1' when (sel = '0' and ready_r = '1') else '0';								
+				s_axis_tready1 <= '1' when (sel = '1' and ready_r = '1') else '0';								
+
+
+				--process (in1, in2 sel)
+				--begin
+				--				case sel is
+				--								when "0" => sal <= in1;
+				--								when "1" => sal <= in2;
+				--								when others => sal <= in1;
+				--				end case;
+				--end process;
+end rtl;
+

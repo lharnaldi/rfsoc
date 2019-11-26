@@ -23,6 +23,7 @@ CORES = axi_axis_reader_v1_0 \
 				axis_packetizer_v1_0 \
 				axis_ram_writer_v1_0 \
 				axis_rxchan16_v1_0\
+				axis_rxc16_dft_2ovs_v1_0 \
 				axis_signal_gen_v1_0 \
 				axi_sts_register_v1_0 \
 				axis_tlast_gen_v1_0 \
